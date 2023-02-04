@@ -15,6 +15,8 @@ from django.utils.encoding import smart_str,force_bytes, DjangoUnicodeDecodeErro
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from auth_app.utils import Util
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives, message
 
 
 #Creating tokens manually
@@ -30,8 +32,15 @@ class UserRegistrationView(APIView):
  def post(self,request,format=None):
     serializer=UserRegistrationSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user=serializer.save()
-        return Response({'msg':'Registation successful'},status=status.HTTP_201_CREATED)
+        user = serializer.save()
+        verification_code = secrets.token_hex(2)
+        data = {
+            'subject':'Registration',
+            'body':'Welcome',
+            'to_email': settings.EMAIL_HOST_USER 
+          }
+        Util.send_email(data)
+        return Response({'msg':'Registation successful', "status":"status.HTTP_201_CREATED"})
     return Response({errors:serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
@@ -47,3 +56,20 @@ class UserLoginView(APIView):
              return Response({'token':token,'msg':'Login successful','status':'status.HTTP_200_OK'})
             else:
              return Response({'errors':{'non_field_errors':['email or password is not valid']},'status':'status.HTTP_404_NOT_FOUND'})
+
+class SendVerificationEmail(APIView):
+    renderer_classes=[UserRenderer]
+    def post(self,request,format=None):
+        email = request.data.get('email')
+        if User.objects.filter(email = email).exists():
+            verification_code = secrets.token_hex(3)
+            subject, from_email, to = 'Email Verification', settings.EMAIL_HOST_USER, email
+            text_content = 'Your Email verfication code is:'
+            html_content = '<p><b>Your Email verfication code is:</b></p>' + verification_code
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            return Response({'status':'status.HTTP_200_OK','message':'Send a verification code on your email'})
+        else:
+            return Response({'status':'status.HTTP_404_NOT_FOUND','message':'user with this email is not registered'})
+        
