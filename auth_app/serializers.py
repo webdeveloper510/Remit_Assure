@@ -19,8 +19,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'location': {'error_messages': {'required': "location is required",'blank':'location could not blank'}},
           }
 
-    def create(self, validated_data):
-      return User.objects.create_user(** validated_data)
+    def create(self, validated_data,):
+        return User.objects.create_user(** validated_data)
 
 class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=250)
