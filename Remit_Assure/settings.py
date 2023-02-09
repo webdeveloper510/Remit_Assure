@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'auth_app',
 
 ]
@@ -39,6 +40,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        
 
 ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -70,7 +72,7 @@ ROOT_URLCONF = 'Remit_Assure.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,10 +158,17 @@ AUTH_USER_MODEL = 'auth_app.User'
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587 #465#
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD =   os.environ.get('EMAIL_PASS')
+EMAIL_HOST_USER = "gurpreet@codenomad.net"
+EMAIL_HOST_PASSWORD =   "Gurpreet1995!"
 EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT= 900 #sec=15 minutes, 
+
+
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'gurpreet@codenomad.net'
+# EMAIL_HOST_PASSWORD = 'Gurpreet1995!'
+# EMAIL_USE_TLS = True
 
 #JWT settings
 SIMPLE_JWT = {
@@ -167,7 +176,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
-    'UPDATE_LAST_LOGIN': False,
+    'UPDATE_LAST_LOGIN': True,
 
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
@@ -212,3 +221,10 @@ CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 # MEDIA_URL = "/media/"
 
 # SITE_URL = 'http://localhost:8000'
+
+import datetime
+TOKEN_EXPIRED_AFTER_SECONDS = timedelta(hours=2)
+
+
+
+
